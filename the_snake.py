@@ -1,5 +1,6 @@
 """Импорт библиотек."""
 from random import randint
+
 import pygame
 
 # Константы для размеров поля и сетки:
@@ -39,12 +40,7 @@ class GameObject:
 
     def draw(self):
         """Отрисовка объекта."""
-        rect = pygame.Rect(
-            (self.position[0], self.position[1]),
-            (GRID_SIZE, GRID_SIZE)
-        )
-        pygame.draw.rect(screen, self.body_color, rect)
-        pygame.draw.rect(screen, BORDER_COLOR, rect, 1)
+        pass
 
 
 class Apple(GameObject):
@@ -55,6 +51,14 @@ class Apple(GameObject):
         super().__init__()
         self.body_color = APPLE_COLOR
         self.randomize_position()
+
+    def draw(self):
+        """Отрисовка яблока."""
+        rect = pygame.Rect(
+            (self.position[0], self.position[1]),
+            (GRID_SIZE, GRID_SIZE))
+        pygame.draw.rect(screen, self.body_color, rect)
+        pygame.draw.rect(screen, BORDER_COLOR, rect, 1)
 
     def randomize_position(self):
         """Случайное положение яблока."""
@@ -75,7 +79,9 @@ class Snake(GameObject):
 
     def reset(self):
         """Перезапуск с начала."""
-        self.positions = [((SCREEN_WIDTH // 2), (SCREEN_HEIGHT // 2))]
+        self.positions = [
+            ((SCREEN_WIDTH // 2), (SCREEN_HEIGHT // 2))
+            ]
         self.length = 2  # Изменили с 1 на 2
         self.direction = RIGHT
         self.next_direction = None
@@ -152,23 +158,22 @@ def main():
         snake.update_direction()
         snake.move()
 
-        # Проверка столкновения с яблоком
-        if snake.get_head_position() == apple.position:
-            snake.length += 1
-            apple.randomize_position()
-            # Убедимся, что яблоко не появилось на змейке
-            while apple.position in snake.positions:
-                apple.randomize_position()
-
-        # Проверка столкновения с собой
-        if snake.get_head_position() in snake.positions[1:]:
-            snake.reset()
-
-        # Отрисовка
         screen.fill(BOARD_BACKGROUND_COLOR)
         snake.draw()
         apple.draw()
         pygame.display.update()
+
+        # Проверка столкновения с яблоком.
+        if snake.get_head_position() == apple.position:
+            snake.length += 1
+            apple.randomize_position()
+            # Если яблоко появилось на змейке.
+            while apple.position in snake.positions:
+                apple.randomize_position()
+
+        # Конец игры из-за столкновения.
+        if snake.get_head_position() in snake.positions[1:]:
+            snake.reset()
 
 
 if __name__ == '__main__':
