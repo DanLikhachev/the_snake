@@ -81,7 +81,7 @@ class Snake(GameObject):
         """Перезапуск с начала."""
         self.positions = [
             ((SCREEN_WIDTH // 2), (SCREEN_HEIGHT // 2))
-            ]
+        ]
         self.length = 2  # Изменили с 1 на 2
         self.direction = RIGHT
         self.next_direction = None
