@@ -46,7 +46,7 @@ clock = pygame.time.Clock()
 class ExitGame(Exception):
     """Конец игры."""
 
-    print('Игра окончена')
+    pass
 
 
 class GameObject:
