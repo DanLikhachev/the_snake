@@ -1,9 +1,8 @@
 """Импорт библиотек."""
+import sys
 from random import randint
 
 import pygame
-
-import sys
 
 # Константы для размеров поля и сетки:
 SCREEN_WIDTH, SCREEN_HEIGHT = 640, 480
