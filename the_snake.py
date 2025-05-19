@@ -47,7 +47,7 @@ clock = pygame.time.Clock()
 class ExitGame(Exception):
     """Конец игры."""
 
-    pass
+    print('Игра окончена')
 
 
 class GameObject:
@@ -209,7 +209,6 @@ def main():
                 apple.randomize_position(snake.positions)
                 screen.fill(BOARD_BACKGROUND_COLOR)
         except ExitGame:
-            print('Игра окончена')
             pygame.quit()
             sys.exit()
 
