@@ -68,7 +68,7 @@ class Apple(GameObject):
     def __init__(self, body_color=APPLE_COLOR):
         """Передача цвета и случайная позиция."""
         super().__init__(body_color)
-        self.randomize_position(positions=START_POSITION)
+        self.randomize_position(positions=[START_POSITION])
 
     def draw(self):
         """Отрисовка класса Яблоко."""
@@ -82,7 +82,7 @@ class Apple(GameObject):
             randint(0, GRID_WIDTH - 1) * GRID_SIZE,
             randint(0, GRID_HEIGHT - 1) * GRID_SIZE
         )
-        if self.position in positions:
+        while self.position in positions:
             self.randomize_position(positions)
 
 
@@ -92,11 +92,8 @@ class Snake(GameObject):
     def __init__(self, body_color=SNAKE_COLOR):
         """Цвет, позиция, направления, длина."""
         super().__init__(body_color)
-        self.positions = [self.position]
-        self.direction = RIGHT
+        self.reset()
         self.next_direction = None
-        self.length = 1
-        self.last = None
 
     def draw(self):
         """Отрисовка класса Змейка."""
@@ -129,28 +126,15 @@ class Snake(GameObject):
         """Передвижение по координатам."""
         x_point, y_point = self.get_head_position()
 
-        if self.direction == RIGHT:
-            new_x = x_point + GRID_SIZE
-            new_y = y_point
-        elif self.direction == LEFT:
-            new_x = x_point - GRID_SIZE
-            new_y = y_point
-        elif self.direction == UP:
-            new_x = x_point
-            new_y = y_point - GRID_SIZE
-        elif self.direction == DOWN:
-            new_x = x_point
-            new_y = y_point + GRID_SIZE
+        x_direction, y_direction = {
+            RIGHT: (GRID_SIZE, 0),
+            LEFT: (GRID_SIZE * -1, 0),
+            UP: (0, GRID_SIZE * -1),
+            DOWN: (0, GRID_SIZE)
+        }[self.direction]
 
-        # Перенос головы при достижениии краев экрана (решено частично?)
-        if new_x >= SCREEN_WIDTH:
-            new_x = 0
-        elif x_point < 0:
-            new_x = SCREEN_WIDTH - GRID_SIZE
-        if y_point >= SCREEN_HEIGHT:
-            new_y = 0
-        elif y_point < 0:
-            new_y = SCREEN_HEIGHT - GRID_SIZE
+        new_x = (x_point + x_direction) % SCREEN_WIDTH
+        new_y = (y_point + y_direction) % SCREEN_WIDTH
 
         self.positions.insert(0, (new_x, new_y))
         self.last = self.positions.pop()
@@ -181,35 +165,33 @@ def handle_keys(game_object):
 
 def main():
     """Запуск игры."""
-    # Инициализация PyGame:
     pygame.init()
-    # Тут нужно создать экземпляры классов.
     apple = Apple(body_color=APPLE_COLOR)
     snake = Snake(body_color=SNAKE_COLOR)
 
     while True:
         clock.tick(SPEED)
+        snake_head = snake.get_head_position()
         try:
             handle_keys(snake)
-            snake.update_direction()
-            apple.draw()
-            snake.move()
-            snake.draw()
-            pygame.display.update()
-
-            # Тут опишите основную логику игры.
-            if snake.get_head_position() == apple.position:
+            if snake_head == apple.position:
                 snake.length += 1
                 snake.positions.insert(0, apple.position)
                 apple.randomize_position(snake.positions)
 
-            elif snake.get_head_position() in snake.positions[1:]:
+            elif snake_head in snake.positions[1:]:
                 snake.reset()
                 apple.randomize_position(snake.positions)
                 screen.fill(BOARD_BACKGROUND_COLOR)
         except ExitGame:
             pygame.quit()
             sys.exit()
+
+        snake.update_direction()
+        apple.draw()
+        snake.move()
+        snake.draw()
+        pygame.display.update()
 
 
 if __name__ == '__main__':
