@@ -42,7 +42,6 @@ pygame.display.set_caption('Змейка')
 clock = pygame.time.Clock()
 
 
-# Тут опишите все классы игры.
 class ExitGame(Exception):
     """Конец игры."""
 
@@ -134,7 +133,7 @@ class Snake(GameObject):
         }[self.direction]
 
         new_x = (x_point + x_direction) % SCREEN_WIDTH
-        new_y = (y_point + y_direction) % SCREEN_WIDTH
+        new_y = (y_point + y_direction) % SCREEN_HEIGHT
 
         self.positions.insert(0, (new_x, new_y))
         self.last = self.positions.pop()
@@ -171,25 +170,28 @@ def main():
 
     while True:
         clock.tick(SPEED)
-        snake_head = snake.get_head_position()
+        snake.update_direction()
+        snake.move()
+
         try:
             handle_keys(snake)
-            if snake_head == apple.position:
-                snake.length += 1
-                snake.positions.insert(0, apple.position)
-                apple.randomize_position(snake.positions)
 
-            elif snake_head in snake.positions[1:]:
-                snake.reset()
-                apple.randomize_position(snake.positions)
-                screen.fill(BOARD_BACKGROUND_COLOR)
         except ExitGame:
             pygame.quit()
             sys.exit()
 
-        snake.update_direction()
+        snake_head = snake.get_head_position()
+        if snake_head == apple.position:
+            snake.length += 1
+            snake.positions.insert(0, apple.position)
+            apple.randomize_position(snake.positions)
+
+        elif snake_head in snake.positions[1:]:
+            snake.reset()
+            apple.randomize_position(snake.positions)
+            screen.fill(BOARD_BACKGROUND_COLOR)
+
         apple.draw()
-        snake.move()
         snake.draw()
         pygame.display.update()
 
